@@ -1,0 +1,63 @@
+Metadata-Version: 2.4
+Name: sec-filing-rag
+Version: 0.1.0
+Summary: RAG application for SEC filings with page citations
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: chromadb>=1.0.0
+Requires-Dist: openai>=1.30.0
+Requires-Dist: pymupdf>=1.24.0
+Requires-Dist: python-dotenv>=1.0.1
+Requires-Dist: streamlit>=1.44.0
+Requires-Dist: tiktoken>=0.9.0
+Provides-Extra: local-embeddings
+Requires-Dist: sentence-transformers>=3.0.0; extra == "local-embeddings"
+
+# SEC Filing RAG
+
+Question-answering over NVIDIA 10-K PDFs with page citations.
+
+## Setup
+
+1. Create a virtual environment and install dependencies:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+2. Configure environment variables:
+
+```bash
+cp .env.example .env
+```
+
+3. Place 10-K PDFs under `data/pdfs/`.
+
+4. Build the vector index:
+
+```bash
+python -m ingestion.ingest
+```
+
+5. Launch the UI:
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+## Environment variables
+
+- `OPENAI_API_KEY`: required for OpenAI embeddings and chat
+- `EMBEDDING_PROVIDER`: `openai` (default) or `sentence-transformers`
+- `EMBEDDING_MODEL`: defaults to `text-embedding-3-small`
+- `CHAT_MODEL`: defaults to `gpt-4.1-mini`
+- `CHROMA_DIR`: defaults to `./chroma_db`
+- `CHROMA_COLLECTION`: defaults to `sec_filings`
+- `PDF_DIR`: defaults to `./data/pdfs`
+
+## Notes
+
+- Answers cite supporting PDF pages as `[filename p.X]`.
+- Ingestion stores filename and page metadata for every chunk.
